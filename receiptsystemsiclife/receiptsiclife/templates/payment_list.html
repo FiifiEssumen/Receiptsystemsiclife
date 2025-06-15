@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Payments - ReceiptSicLife{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-money-bill-wave"></i> Payments</h1>
+    <a href="{% url 'payment_create' %}" class="btn btn-success">
+        <i class="fas fa-plus"></i> Record New Payment
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if payments %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Receipt #</th>
+                            <th>Student</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-info">{{ payment.receipt_number }}</span>
+                            </td>
+                            <td>{{ payment.student.student_name }}</td>
+                            <td class="fw-bold text-success">${{ payment.amount }}</td>
+                            <td>{{ payment.get_payment_method_display }}</td>
+                            <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                            <td>
+                                <span class="badge bg-{% if payment.status == 'completed' %}success{% elif payment.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                    {{ payment.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'payment_detail' payment.pk %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                {% if payment.status == 'completed' %}
+                                    <a href="{% url 'download_receipt' payment.pk %}" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-download"></i> Receipt
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
+                <h5>No payments yet</h5>
+                <a href="{% url 'payment_create' %}" class="btn btn-success">Record First Payment</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
